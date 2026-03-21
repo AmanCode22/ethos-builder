@@ -35,19 +35,9 @@ jobs:
       - name: Build forge
         run: |
           python -m nuitka --assume-yes-for-downloads --onefile forge/main.py --output-filename=forge.exe
-      - name: Debug paths
-        run: |
-          echo "=== Workspace root ==="
-          dir D:\a\ethos-builder\ethos-builder\
-          echo "=== builder/windows ==="
-          dir builder\windows\
-          echo "=== Does ethos.exe exist? ==="
-          Test-Path "ethos.exe"
-          echo "=== Does forge.exe exist? ==="
-          Test-Path "forge.exe"
       - name: Build windows installer
         run: |
-          iscc builder/windows/ethos.iss
+          iscc builder/windows/ethos_script.iss
       - name: Upload installer as artifact
         uses: actions/upload-artifact@v6
         with:
