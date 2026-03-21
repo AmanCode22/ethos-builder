@@ -58,8 +58,9 @@ Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\DefaultIcon"; ValueType: s
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
 
 [Dirs]
-Name: "{userprofile}\.ethos\traits\hard_traits"
-Name: "{userprofile}\.ethos\traits\soft_traits"
+Name: "{%USERPROFILE}\.ethos\traits\hard_traits"
+Name: "{%USERPROFILE}\.ethos\traits\soft_traits"
+
 
 [Code]
 const EnvironmentKey = 'Environment';
