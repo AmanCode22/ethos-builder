@@ -31,10 +31,10 @@ jobs:
           pip install -r ethos/requirements.txt
       - name: Build ethos
         run: |
-          python -m nuitka --onefile ethos/main.py --output-filename=ethos.exe
+          python -m nuitka --assume-yes-for-downloads --onefile ethos/main.py --output-filename=ethos.exe
       - name: Build forge
         run: |
-          python -m nuitka --onefile forge/main.py --output-filename=forge.exe
+          python -m nuitka --assume-yes-for-downloads --onefile forge/main.py --output-filename=forge.exe
       - name: Build windows installer
         run: |
           iscc builder/windows/ethos.iss
