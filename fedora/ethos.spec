@@ -21,7 +21,7 @@ Requires:       forge >= %{version}
 Ethos is a modern, lightweight programming language designed for cross-platform development. It features a native compiler powered by Nuitka, enabling fast execution and seamless distribution.
 
 %prep
-%setup -q -n ethos-lang-v0.2.0-alpha
+%setup -q -n ethos-lang-0.2.0-alpha
 
 %build
 python3 -m pip install -r requirements.txt

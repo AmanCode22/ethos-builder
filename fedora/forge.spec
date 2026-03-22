@@ -21,7 +21,7 @@ Requires:       ethos >= %{version}
 Forge is the official project manager for Ethos. It handles project initialization, dependency management, and build workflows.
 
 %prep
-%setup -q -n forge-v0.2.0-alpha
+%setup -q -n forge-0.2.0-alpha
 
 %build
 python3 -m pip install -r requirements.txt
