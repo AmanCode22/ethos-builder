@@ -24,6 +24,8 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 UninstallDisplayIcon={app}\{#MyAppExeName}
+SetupIconFile=..\ethos_logo.ico
+
 ; "ArchitecturesAllowed=x64compatible" specifies that Setup cannot run
 ; on anything but x64 and Windows 11 on Arm.
 ArchitecturesAllowed=x64compatible
@@ -58,9 +60,8 @@ Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\DefaultIcon"; ValueType: s
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocKey}\shell\open\command"; ValueType: string; ValueName: ""; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
 
 [Dirs]
-Name: "{%USERPROFILE}\.ethos\traits\hard_traits"
-Name: "{%USERPROFILE}\.ethos\traits\soft_traits"
-
+Name: "{userprofile}\.ethos\traits\hard_traits"
+Name: "{userprofile}\.ethos\traits\soft_traits"
 
 [Code]
 const EnvironmentKey = 'Environment';
