@@ -1,3 +1,5 @@
+%global debug_package %{nil}
+
 Name:           forge
 Version:        0.2.0
 Release:        1%{?dist}
