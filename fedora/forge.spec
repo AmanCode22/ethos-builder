@@ -23,14 +23,11 @@ It handles dependency resolution, project scaffolding, and compilation pipelines
 %prep
 
 %setup -q -n forge-%{version}
-
 %build
 
-python3 -m pip install --user --no-index --find-links=vendor nuitka zstandard
+python3 -m pip install --user --break-system-packages --no-index --find-links=vendor nuitka zstandard
 
-
-python3 -m nuitka --assume-yes-for-downloads --onefile main.py --output-filename=forge
-
+python3 -m nuitka --assume-yes-for-downloads --onefile main.py --output-filename=ethos
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_bindir}

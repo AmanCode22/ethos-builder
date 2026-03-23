@@ -23,14 +23,11 @@ It features a native Nuitka-based compiler designed for speed and simplicity.
 %prep
 
 %setup -q -n ethos-lang-%{version}
-
 %build
 
-python3 -m pip install --user --no-index --find-links=vendor nuitka zstandard
-
+python3 -m pip install --user --break-system-packages --no-index --find-links=vendor nuitka zstandard
 
 python3 -m nuitka --assume-yes-for-downloads --onefile main.py --output-filename=ethos
-
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_bindir}
