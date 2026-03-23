@@ -1,65 +1,75 @@
 name: Build Linux Tar
-
 on:
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout builder
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           path: builder
+
       - name: Checkout ethos
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           repository: AmanCode22/ethos-lang
-          path: ethos
+          path: ethos-src
+
       - name: Checkout Forge
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           repository: AmanCode22/forge
-          path: forge
+          path: forge-src
+
       - name: Install python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+
       - name: Install requirements
         run: |
           pip install --upgrade pip
-          pip install -r ethos/requirements.txt
+          pip install -r ethos-src/requirements.txt
+          pip install -r forge-src/requirements.txt
+
       - name: Install build requirements from apt
         run: |
           sudo apt update
-          sudo apt install python3 python3-dev build-essential patchelf
+          sudo apt install python3-dev build-essential patchelf -y
+
       - name: Build ethos
         run: |
-          python -m nuitka --assume-yes-for-downloads --onefile ethos/main.py --output-filename=ethos
+          python -m nuitka --assume-yes-for-downloads --onefile ethos-src/main.py --output-filename=ethos
+
       - name: Build forge
         run: |
-          python -m nuitka --assume-yes-for-downloads --onefile forge/main.py --output-filename=forge
+          python -m nuitka --assume-yes-for-downloads --onefile forge-src/main.py --output-filename=forge
+
       - name: Setup folder for tar and create tar
         run: |
           mkdir ethos-build
           cp builder/linux__generic/install.sh ethos-build/
           chmod +x ethos-build/install.sh
           mkdir ethos-build/bin
-          cp ethos ethos-build/bin
-          cp forge ethos-build/bin
+          cp ethos ethos-build/bin/ethos
+          cp forge ethos-build/bin/forge
           tar -czvf ethos-build.tar.gz ethos-build
+
       - name: Upload tar as artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: ethos-build.tar.gz
           path: ethos-build.tar.gz
+
       - name: Upload ethos compiled file
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: ethos
           path: ethos
+
       - name: Upload forge compiled file
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: forge
           path: forge
