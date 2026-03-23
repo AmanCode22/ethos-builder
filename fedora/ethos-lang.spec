@@ -11,6 +11,8 @@ Source0:        ethos-lang-v%{version}.tar.gz
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-wheel
 BuildRequires:  gcc
 BuildRequires:  patchelf
 BuildRequires:  zstd
@@ -27,7 +29,7 @@ It features a native Nuitka-based compiler designed for speed and simplicity.
 
 python3 -m pip install --user --break-system-packages --no-index --find-links=vendor nuitka zstandard
 
-python3 -m nuitka --assume-yes-for-downloads --onefile main.py --output-filename=ethos
+python3 -m pip install --user --break-system-packages --no-build-isolation --no-index --find-links=vendor nuitka zstandard
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_bindir}
