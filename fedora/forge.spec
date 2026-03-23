@@ -14,7 +14,7 @@ BuildRequires:  python3-pip
 BuildRequires:  gcc
 BuildRequires:  patchelf
 BuildRequires:  zstd
-Requires:       ethos >= %{version}
+Requires:       ethos-lang >= %{version}
 
 %description
 Forge is the official project manager and build tool for the Ethos programming language.
