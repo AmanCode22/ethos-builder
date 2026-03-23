@@ -1,0 +1,7 @@
+forge (0.3.0-1) unstable; urgency=medium
+
+  * Version bump to 0.3.0 and OBS build support.
+  * Implemented Hybrid Vendoring (OS Zstandard + Local Nuitka).
+  * Added memory protections for ARM builds.
+
+ -- Aman Adlakha <amanady125@gmail.com>  Mon, 23 Mar 2026 17:30:00 +0530

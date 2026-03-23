@@ -1,0 +1,38 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE = 1
+export PIP_FLAGS = --user --break-system-packages --no-build-isolation --no-deps --no-index --find-links=vendor
+
+build:
+	python3 -m pip install $(PIP_FLAGS) nuitka
+	python3 -m nuitka --assume-yes-for-downloads --jobs=1 --lto=no --low-memory --onefile main.py --output-filename=ethos
+	touch build
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+	mkdir -p debian/ethos-lang/usr/bin
+	cp ethos debian/ethos-lang/usr/bin/ethos
+	chmod 755 debian/ethos-lang/usr/bin/ethos
+
+binary: install
+	dh_testdir
+	dh_testroot
+	dh_installchangelogs
+	dh_installdocs
+	dh_compress
+	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build ethos
+	dh_clean
+
+.PHONY: build install binary clean
