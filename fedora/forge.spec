@@ -3,33 +3,47 @@
 Name:           forge
 Version:        0.3.0
 Release:        1%{?dist}
-Summary:        The Forge Project Manager for Ethos
+Summary:        The Ethos Package Manager
 
-License:        MIT
+License:        GPL-3.0
 URL:            https://github.com/AmanCode22/ethos-builder
 Source0:        forge-v%{version}.tar.gz
+
 
 BuildRequires:  python3-devel
 BuildRequires:  python3-pip
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-wheel
+BuildRequires:  python3-packaging
 BuildRequires:  gcc
 BuildRequires:  patchelf
-BuildRequires:  zstd
-Requires:       ethos-lang >= %{version}
+
+
+BuildRequires:  python3-zstandard
+
+Requires:       ethos-lang
 
 %description
-Forge is the official project manager and build tool for the Ethos programming language.
-It handles dependency resolution, project scaffolding, and compilation pipelines.
+Forge is the official package manager for the Ethos programming language.
 
 %prep
-
 %setup -q -n forge-%{version}
+
 %build
 
-python3 -m pip install --user --break-system-packages --no-build-isolation --no-index --find-links=vendor nuitka zstandard
+%global pip_flags --user --no-build-isolation --no-deps --no-index --find-links=vendor
 
-python3 -m nuitka --assume-yes-for-downloads --onefile main.py --output-filename=ethos
+
+%if 0%{?suse_version} == 1500
+python3 -m pip install %{pip_flags} nuitka
+%else
+
+python3 -m pip install %{pip_flags} --break-system-packages nuitka
+%endif
+
+
+python3 -m nuitka --assume-yes-for-downloads --low-memory --jobs=1 --lto=no --onefile forge.py --output-filename=forge
+
 %install
 rm -rf %{buildroot}
 mkdir -p %{buildroot}%{_bindir}
@@ -39,5 +53,6 @@ install -m 0755 forge %{buildroot}%{_bindir}/forge
 %{_bindir}/forge
 
 %changelog
-* Mon Mar 23 2026 Aman Adlakha <amanady125@gmail.com> - 0.3.0-1
-- Version bump to 0.3.0 and OBS offline build support with -v and --version tag support
+* Mon Mar 23 2026 Aman Adhlakha <amanady125@gmail.com> - 0.3.0-1
+- Initial release for OBS offline build support
+- Implemented Hybrid Vendoring (OS Zstandard + Local Nuitka)
