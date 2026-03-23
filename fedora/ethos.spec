@@ -1,7 +1,7 @@
 # Disable debuginfo and debugsource packages for Nuitka onefile builds
 %global debug_package %{nil}
 
-Name:           ethos
+Name:           ethos-lang
 Version:        0.2.0
 Release:        1%{?dist}
 Summary:        The Ethos programming language compiler.
