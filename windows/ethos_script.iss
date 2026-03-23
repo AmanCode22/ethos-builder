@@ -1,5 +1,5 @@
 #define MyAppName "Ethos"
-#define MyAppVersion "0.2"
+#define MyAppVersion "0.3.0"
 #define MyAppPublisher "Aman Adlakha"
 #define MyAppURL "https://github.com/AmanCode22/ethos-lang"
 #define MyAppExeName "ethos.exe"
@@ -21,7 +21,7 @@ SetupIconFile=..\ethos_logo.ico
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
-OutputBaseFilename=Ethos-v0.2-windows-installer
+OutputBaseFilename=Ethos-windows-installer
 SolidCompression=yes
 WizardStyle=modern dynamic windows11
 ChangesEnvironment=yes
