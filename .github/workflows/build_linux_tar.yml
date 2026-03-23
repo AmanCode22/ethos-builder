@@ -29,6 +29,10 @@ jobs:
         run: |
           pip install --upgrade pip
           pip install -r ethos/requirements.txt
+      - name: Install build requirements from apt
+        run: |
+          sudo apt update
+          sudo apt install python3 python3-dev build-essential patchelf
       - name: Build ethos
         run: |
           python -m nuitka --assume-yes-for-downloads --onefile ethos/main.py --output-filename=ethos
