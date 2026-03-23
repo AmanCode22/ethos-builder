@@ -42,7 +42,7 @@ python3 -m pip install %{pip_flags} --break-system-packages nuitka
 %endif
 
 
-python3 -m nuitka --assume-yes-for-downloads --low-memory --jobs=1 --lto=no --onefile forge.py --output-filename=forge
+python3 -m nuitka --assume-yes-for-downloads --low-memory --jobs=1 --lto=no --onefile main.py --output-filename=forge
 
 %install
 rm -rf %{buildroot}
