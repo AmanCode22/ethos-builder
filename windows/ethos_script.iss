@@ -48,7 +48,9 @@ Name: "{%USERPROFILE}\.ethos\traits"
 Name: "{%USERPROFILE}\.ethos\traits\hard_traits"
 
 [Code]
-const EnvironmentKey = 'Environment';
+const
+  EnvironmentKey = 'Environment';
+  WM_WININICHANGE = $001A;
 
 procedure CurStepChanged(CurStep: TSetupStep);
 var
