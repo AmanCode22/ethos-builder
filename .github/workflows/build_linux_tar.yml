@@ -1,11 +1,11 @@
-name: Build For Windows
+name: Build Linux Tar
 
 on:
   workflow_dispatch:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout builder
         uses: actions/checkout@v6
@@ -31,25 +31,31 @@ jobs:
           pip install -r ethos/requirements.txt
       - name: Build ethos
         run: |
-          python -m nuitka --assume-yes-for-downloads --onefile ethos/main.py --output-filename=ethos.exe
+          python -m nuitka --assume-yes-for-downloads --onefile ethos/main.py --output-filename=ethos
       - name: Build forge
         run: |
-          python -m nuitka --assume-yes-for-downloads --onefile forge/main.py --output-filename=forge.exe
-      - name: Build windows installer
+          python -m nuitka --assume-yes-for-downloads --onefile forge/main.py --output-filename=forge
+      - name: Setup folder for tar and create tar
         run: |
-          iscc builder/windows/ethos_script.iss
-      - name: Upload installer as artifact
+          mkdir ethos-build
+          cp builder/linux__generic/install.sh ethos-build/
+          chmod +x ethos-build/install.sh
+          mkdir ethos-build/bin
+          cp ethos ethos-build/bin
+          cp forge ethos-build/bin
+          tar -czvf ethos-build.tar.gz ethos-build
+      - name: Upload tar as artifact
         uses: actions/upload-artifact@v6
         with:
-          name: Ethos-windows-installer.exe
-          path: builder/windows/Output/Ethos-windows-installer.exe
-      - name: Upload ethos compiled exe
+          name: ethos-build.tar.gz
+          path: ethos-build.tar.gz
+      - name: Upload ethos compiled file
         uses: actions/upload-artifact@v6
         with:
-          name: ethos.exe
-          path: ethos.exe
-      - name: Upload forge compiled exe
+          name: ethos
+          path: ethos
+      - name: Upload forge compiled file
         uses: actions/upload-artifact@v6
         with:
-          name: forge.exe
-          path: forge.exe
+          name: forge
+          path: forge
