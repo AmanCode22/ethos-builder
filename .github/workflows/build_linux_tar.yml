@@ -49,7 +49,7 @@ jobs:
       - name: Setup folder for tar and create tar
         run: |
           mkdir ethos-build
-          cp builder/linux__generic/install.sh ethos-build/
+          cp builder/linux_generic/install.sh ethos-build/
           chmod +x ethos-build/install.sh
           mkdir ethos-build/bin
           cp ethos ethos-build/bin/ethos
