@@ -17,6 +17,7 @@ BuildRequires:  python3-pip
 BuildRequires:  patchelf
 
 Requires:       bash
+Recommends:    forge
 
 
 %description

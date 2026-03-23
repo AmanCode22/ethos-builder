@@ -17,7 +17,7 @@ BuildRequires:  patchelf
 
 
 Requires:       bash
-Requires:       ethos >= %{version}
+Requires:       ethos-lang >= %{version}
 
 %description
 Forge is the official project manager for Ethos. It handles project initialization, dependency management, and build workflows.
