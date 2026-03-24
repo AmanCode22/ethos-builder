@@ -1,4 +1,4 @@
-forge (0.3.0-1) unstable; urgency=medium
+ethos-forge (0.3.0-1) unstable; urgency=medium
 
   * Version bump to 0.3.0 and OBS build support.
   * Implemented Hybrid Vendoring (OS Zstandard + Local Nuitka).

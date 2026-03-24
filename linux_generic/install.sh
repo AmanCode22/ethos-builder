@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 original_user="${SUDO_USER:-$USER}"
 user_home=$(getent passwd "$original_user" | cut -d: -f6)
 user_bin="$user_home/bin"
@@ -13,7 +12,7 @@ if [[ $EUID -ne 0 ]]; then
         mkdir -p "$user_bin"
         cp bin/ethos "$user_bin/"
         cp bin/forge "$user_bin/"
-
+        chmod +x "$user_bin/ethos" "$user_bin/forge"
 
         if [[ ":$PATH:" == *":$user_bin:"* ]]; then
             echo "$user_bin is already in PATH."
@@ -29,7 +28,6 @@ if [[ $EUID -ne 0 ]]; then
         exit 1
     fi
 fi
-
 
 echo "Installing globally with root privileges..."
 cp bin/ethos /usr/local/bin/ethos

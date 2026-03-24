@@ -1,0 +1,35 @@
+# Maintainer: Aman Adlakha <amanady125@gmail.com>
+pkgname=ethos-lang
+pkgver=0.3.0
+pkgrel=1
+pkgdesc="The Ethos Programming Language Compiler"
+arch=('x86_64' 'aarch64')
+url="https://github.com/AmanCode22/ethos-lang"
+license=('Apache-2.0')
+depends=('python' 'python-zstandard' 'gcc' 'patchelf')
+makedepends=('python-pip' 'python-setuptools' 'python-wheel')
+optdepends=('ethos-forge: for package management and project building')
+
+
+options=('!lto' '!strip')
+
+source=("ethos-lang-v${pkgver}.tar.gz")
+sha256sums=('SKIP')
+
+build() {
+  cd "ethos-lang-${pkgver}"
+
+
+  python3 -m pip install --user --break-system-packages --no-build-isolation --no-deps --no-index --find-links=vendor nuitka
+
+
+  unset LDFLAGS
+
+
+  python3 -m nuitka --assume-yes-for-downloads --jobs=1 --lto=no --low-memory --onefile main.py --output-filename=ethos
+}
+
+package() {
+  cd "ethos-lang-${pkgver}"
+  install -Dm755 ethos "${pkgdir}/usr/bin/ethos"
+}

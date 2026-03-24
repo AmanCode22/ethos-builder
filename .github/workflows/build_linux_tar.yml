@@ -1,6 +1,8 @@
 name: Build Linux Tar
+
 on:
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -40,11 +42,13 @@ jobs:
 
       - name: Build ethos
         run: |
-          python -m nuitka --assume-yes-for-downloads --onefile ethos-src/main.py --output-filename=ethos
+          unset LDFLAGS
+          python -m nuitka --assume-yes-for-downloads --onefile --onefile-no-strip ethos-src/main.py --output-filename=ethos
 
       - name: Build forge
         run: |
-          python -m nuitka --assume-yes-for-downloads --onefile forge-src/main.py --output-filename=forge
+          unset LDFLAGS
+          python -m nuitka --assume-yes-for-downloads --onefile --onefile-no-strip forge-src/main.py --output-filename=forge
 
       - name: Setup folder for tar and create tar
         run: |

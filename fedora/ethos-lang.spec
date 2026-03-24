@@ -1,4 +1,6 @@
 %global debug_package %{nil}
+%global __strip /bin/true
+%global __os_install_post %{nil}
 
 Name:           ethos-lang
 Version:        0.3.0
@@ -21,7 +23,7 @@ BuildRequires:  patchelf
 
 BuildRequires:  python3-zstandard
 
-Recommends:     forge
+Recommends:     ethos-forge
 
 %description
 Ethos is a modern, lightweight compiled programming language.

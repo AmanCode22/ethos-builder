@@ -17,6 +17,7 @@ Standards-Version: 4.1.4
 Package: ethos-lang
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: ethos-forge
 Description: The Ethos Programming Language Compiler
  Ethos is a modern, lightweight compiled programming language.
  It features a native Nuitka-based compiler designed for speed and simplicity.

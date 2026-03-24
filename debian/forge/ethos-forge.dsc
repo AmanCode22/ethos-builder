@@ -1,6 +1,6 @@
 Format: 1.0
-Source: forge
-Binary: forge
+Source: ethos-forge
+Binary: ethos-forge
 Architecture: any
 Version: 0.3.0-1
 Maintainer: Aman Adlakha <amanady125@gmail.com>

@@ -1,4 +1,4 @@
-Source: forge
+Source: ethos-forge
 Section: devel
 Priority: optional
 Maintainer: Aman Adlakha <amanady125@gmail.com>
@@ -14,9 +14,12 @@ Build-Depends: debhelper (>= 13),
                patchelf
 Standards-Version: 4.1.4
 
-Package: forge
+Package: ethos-forge
 Architecture: any
+Provides: forge
+Conflicts: forge
 Depends: ethos-lang, ${shlibs:Depends}, ${misc:Depends}
 Description: The Ethos Package Manager
- Forge is the official package manager for the Ethos programming language.
+ Ethos-Forge is the official package manager for the Ethos programming language.
  It handles dependencies and project management for Ethos developers.
+ The command-line tool is still accessed via 'forge'.
