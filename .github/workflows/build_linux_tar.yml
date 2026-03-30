@@ -43,12 +43,12 @@ jobs:
       - name: Build ethos
         run: |
           unset LDFLAGS
-          python -m nuitka --assume-yes-for-downloads --onefile --no-strip ethos-src/main.py --output-filename=ethos
+          python -m nuitka --assume-yes-for-downloads --onefile --unstripped ethos-src/main.py --output-filename=ethos
 
       - name: Build forge
         run: |
           unset LDFLAGS
-          python -m nuitka --assume-yes-for-downloads --onefile --no-strip forge-src/main.py --output-filename=forge
+          python -m nuitka --assume-yes-for-downloads --onefile --unstripped forge-src/main.py --output-filename=forge
 
       - name: Setup folder for tar and create tar
         run: |
