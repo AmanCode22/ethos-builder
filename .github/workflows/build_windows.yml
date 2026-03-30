@@ -8,38 +8,48 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: Checkout builder
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           path: builder
+
       - name: Checkout ethos
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           repository: AmanCode22/ethos-lang
           path: ethos
+
       - name: Checkout Forge
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
           repository: AmanCode22/forge
           path: forge
+
       - name: Install python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.10"
+
       - name: Install requirements
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r ethos/requirements.txt
+
       - name: Build ethos
         run: |
           python -m nuitka --assume-yes-for-downloads --standalone ethos/main.py --output-filename=ethos.exe --output-dir=build_ethos
+          Rename-Item -Path "build_ethos\main.dist" -NewName "ethos.dist"
+
       - name: Build forge
         run: |
           python -m nuitka --assume-yes-for-downloads --standalone forge/main.py --output-filename=forge.exe --output-dir=build_forge
+          Rename-Item -Path "build_forge\main.dist" -NewName "forge.dist"
+
       - name: Build windows installer
         run: |
           iscc builder/windows/ethos_script.iss
+
       - name: Upload installer as artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v4
         with:
           name: Ethos-windows-installer.exe
           path: builder/windows/Output/Ethos-windows-installer.exe
