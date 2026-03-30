@@ -3,7 +3,7 @@
 %global __os_install_post %{nil}
 
 Name:           ethos-lang
-Version:        0.3.0
+Version:        0.4.0
 Release:        1%{?dist}
 Summary:        The Ethos Programming Language Compiler
 
@@ -56,8 +56,7 @@ install -m 0755 ethos %{buildroot}%{_bindir}/ethos
 %{_bindir}/ethos
 
 %changelog
-* Mon Mar 23 2026 Aman Adlakha <amanady125@gmail.com> - 0.3.0-1
-- Version bump to 0.3.0 and OBS offline build support
-- Implemented Hybrid Vendoring (OS Zstandard + Local Nuitka)
-- Added conditional PIP flags for Leap 15.6 compatibility
-- Throttled Nuitka build (--jobs=1 --lto=no) to prevent ARM OOM crashes
+* Mon Mar 30 2026 Aman Adlakha <amanady125@gmail.com> - 0.4.0-1
+- Added std python libs support using shim.
+- Fixed critical bugs.
+- Added type casting support

@@ -31,10 +31,10 @@ jobs:
           pip install -r ethos/requirements.txt
       - name: Build ethos
         run: |
-          python -m nuitka --assume-yes-for-downloads --onefile ethos/main.py --output-filename=ethos.exe
+          python -m nuitka --assume-yes-for-downloads --standalone ethos/main.py --output-filename=ethos.exe --output-dir=build_ethos
       - name: Build forge
         run: |
-          python -m nuitka --assume-yes-for-downloads --onefile forge/main.py --output-filename=forge.exe
+          python -m nuitka --assume-yes-for-downloads --standalone forge/main.py --output-filename=forge.exe --output-dir=build_forge
       - name: Build windows installer
         run: |
           iscc builder/windows/ethos_script.iss
@@ -43,13 +43,3 @@ jobs:
         with:
           name: Ethos-windows-installer.exe
           path: builder/windows/Output/Ethos-windows-installer.exe
-      - name: Upload ethos compiled exe
-        uses: actions/upload-artifact@v6
-        with:
-          name: ethos.exe
-          path: ethos.exe
-      - name: Upload forge compiled exe
-        uses: actions/upload-artifact@v6
-        with:
-          name: forge.exe
-          path: forge.exe

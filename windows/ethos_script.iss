@@ -1,5 +1,5 @@
 #define MyAppName "Ethos"
-#define MyAppVersion "0.3.0"
+#define MyAppVersion "0.4.0-beta"
 #define MyAppPublisher "Aman Adlakha"
 #define MyAppURL "https://github.com/AmanCode22/ethos-lang"
 #define MyAppExeName "ethos.exe"
@@ -33,8 +33,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "..\..\ethos.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\..\forge.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\build_ethos\ethos.dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\build_forge\forge.dist\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Registry]
 Root: HKA; Subkey: "Software\Classes\{#MyAppAssocExt}\OpenWithProgids"; ValueType: string; ValueName: "{#MyAppAssocKey}"; ValueData: ""; Flags: uninsdeletevalue

@@ -3,7 +3,7 @@
 %global __os_install_post %{nil}
 
 Name:           ethos-forge
-Version:        0.3.0
+Version:        0.4.0
 Release:        1%{?dist}
 Summary:        The Ethos Package Manager
 
@@ -55,7 +55,6 @@ install -m 0755 forge %{buildroot}%{_bindir}/forge
 %{_bindir}/forge
 
 %changelog
-* Mon Mar 23 2026 Aman Adlakha <amanady125@gmail.com> - 0.3.0-1
-- Renamed package to ethos-forge for universal consistency
-- Initial release for OBS offline build support
-- Implemented Hybrid Vendoring (OS Zstandard + Local Nuitka)
+* Mon Mar 30 2026 Aman Adlakha <amanady125@gmail.com> - 0.4.0-1
+- Fixed critical issue in cli.
+- Added dependencies support in soft traits.

@@ -1,7 +1,6 @@
-ethos-forge (0.3.0-1) unstable; urgency=medium
+ethos-forge (0.4.0-1) unstable; urgency=medium
 
-  * Version bump to 0.3.0 and OBS build support.
-  * Implemented Hybrid Vendoring (OS Zstandard + Local Nuitka).
-  * Added memory protections for ARM builds.
+  * Fixed critical issue in cli.
+  * Added dependencies support in soft traits.
 
- -- Aman Adlakha <amanady125@gmail.com>  Mon, 23 Mar 2026 17:30:00 +0530
+ -- Aman Adlakha <amanady125@gmail.com>  Mon, 30 Mar 2026 17:30:00 +0530
