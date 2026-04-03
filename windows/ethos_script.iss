@@ -21,7 +21,8 @@ SetupIconFile=..\ethos_logo.ico
 ArchitecturesInstallIn64BitMode=x64compatible arm64
 ArchitecturesInstallIn64BitMode=x64compatible arm64
 DisableProgramGroupPage=yes
-OutputBaseFilename=Ethos-windows-installer
+OutputBaseFilename=Ethos-windows-installer-{#AppArch}
+
 SolidCompression=yes
 WizardStyle=modern dynamic windows11
 ChangesEnvironment=yes
