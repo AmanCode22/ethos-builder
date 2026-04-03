@@ -11,7 +11,7 @@ jobs:
           - arch_name: x86_64
             runner: windows-latest
           - arch_name: arm64
-            runner: windows-arm64
+            runner: windows-11-arm
 
     runs-on: ${{ matrix.runner }}
     
