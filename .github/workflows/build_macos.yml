@@ -1,0 +1,98 @@
+name: Build macOS (Intel & ARM) - Cross‑Arch PKGs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - arch: arm64
+            target: arm64-apple-macos11
+            deployment_target: "11.0"
+          - arch: x86_64
+            target: x86_64-apple-macos10.15
+            deployment_target: "10.15"
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout ethos
+        uses: actions/checkout@v4
+        with:
+          repository: AmanCode22/ethos-lang
+          path: ethos
+
+      - name: Checkout Forge
+        uses: actions/checkout@v4
+        with:
+          repository: AmanCode22/forge
+          path: forge
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install requirements
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f ethos/requirements.txt ]; then pip install -r ethos/requirements.txt; fi
+          if [ -f forge/requirements.txt ]; then pip install -r forge/requirements.txt; fi
+
+      - name: Build Ethos (${{ matrix.arch }})
+        run: |
+          export CCFLAGS="-mmacosx-version-min=${{ matrix.deployment_target }}"
+          export LDFLAGS="-mmacosx-version-min=${{ matrix.deployment_target }}"
+          python -m nuitka --assume-yes-for-downloads \
+                           --onefile \
+                           --unstripped \
+                           --macos-target-arch=${{ matrix.arch }} \
+                           ethos/main.py \
+                           --output-filename=ethos_bin
+
+      - name: Build Forge (${{ matrix.arch }})
+        run: |
+          export CCFLAGS="-mmacosx-version-min=${{ matrix.deployment_target }}"
+          export LDFLAGS="-mmacosx-version-min=${{ matrix.deployment_target }}"
+          python -m nuitka --assume-yes-for-downloads \
+                           --onefile \
+                           --unstripped \
+                           --macos-target-arch=${{ matrix.arch }} \
+                           forge/main.py \
+                           --output-filename=forge_bin
+
+      - name: Create PKG payload
+        run: |
+          mkdir -p payload/usr/local/bin
+          cp ethos_bin payload/usr/local/bin/ethos
+          cp forge_bin payload/usr/local/bin/forge
+          chmod +x payload/usr/local/bin/ethos
+          chmod +x payload/usr/local/bin/forge
+
+      - name: Build macOS installer (.pkg)
+        run: |
+          pkgbuild --root payload \
+                   --identifier com.amancode.ethos \
+                   --version 0.4.0 \
+                   --install-location / \
+                   Ethos-Forge-macOS-${{ matrix.arch }}.pkg
+
+      
+      - name: Upload Ethos binary (${{ matrix.arch }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: ethos-binary-${{ matrix.arch }}
+          path: ethos_bin
+
+      - name: Upload Forge binary (${{ matrix.arch }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: forge-binary-${{ matrix.arch }}
+          path: forge_bin
+
+      - name: Upload PKG installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: ethos-forge-installer-${{ matrix.arch }}
+          path: Ethos-Forge-macOS-${{ matrix.arch }}.pkg
