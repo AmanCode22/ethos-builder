@@ -5,7 +5,16 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    strategy:
+      matrix:
+        include:
+          - arch_name: x86_64
+            runner: windows-latest
+          - arch_name: arm64
+            runner: windows-arm64
+
+    runs-on: ${{ matrix.runner }}
+    
     steps:
       - name: Checkout builder
         uses: actions/checkout@v4
@@ -33,6 +42,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r ethos/requirements.txt
+          pip install nuitka
 
       - name: Build ethos
         run: |
@@ -45,11 +55,12 @@ jobs:
           Rename-Item -Path "build_forge\main.dist" -NewName "forge.dist"
 
       - name: Build windows installer
+        #
         run: |
-          iscc builder/windows/ethos_script.iss
+          iscc /DAppArch=${{ matrix.arch_name }} builder/windows/ethos_script.iss
 
       - name: Upload installer as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Ethos-windows-installer.exe
-          path: builder/windows/Output/Ethos-windows-installer.exe
+          name: Ethos-windows-installer-${{ matrix.arch_name }}
+          path: builder/windows/Output/Ethos-windows-installer-${{ matrix.arch_name }}.exe
