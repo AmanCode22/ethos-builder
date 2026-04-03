@@ -18,10 +18,8 @@ The core `ethos-lang` and `forge` repositories are strictly dedicated to source 
 
 **Standalone OS Installers:**
 * **Windows (`.msi` / `.exe`):** Configures the installation wizard, sets the global system `PATH`, and registers the `.ethos` file extension.
-* **macOS (`.pkg`):** Packages Apple Silicon and Intel binaries into standard signed Apple installers.
-
-### 🚀 Future Roadmap
-* **Android (Termux):** Native compilation and environment configuration for running Ethos and Forge directly within the Termux mobile terminal.
+* **macOS (`.pkg`):** Packages Apple Silicon and Intel binaries into standard  Apple installers.
+* **Android (Termux):** Termux packages needs python to be installed on termux and these are packages are packed using termux docker images on arm64 ubuntu and for armv7i x86 ubuntu is used with qemu.
 
 ### 🛠️ Installer Responsibilities
 Regardless of the operating system, all builder scripts guarantee the following environment state upon installation:
