@@ -76,7 +76,7 @@ jobs:
           mv makeself $PREFIX/bin/
           mv makeself-header.sh $PREFIX/bin/
 
-          COMMON_FLAGS="--standalone --clang --jobs=1"
+          COMMON_FLAGS="--standalone --clang --jobs=1 --noinclude-default-mode=error"
 
           cd /workspace/ethos-lang
           python -m nuitka $COMMON_FLAGS -o ethos-$ARCH main.py
@@ -88,12 +88,12 @@ jobs:
           cat << 'EOF2' > package-ethos/run.sh
           #!/data/data/com.termux/files/usr/bin/bash
           export LD_LIBRARY_PATH=$PREFIX/lib
-          ./main.dist/ethos-*
+          exec ./main.dist/ethos-* "$@"
           EOF2
 
           chmod +x package-ethos/run.sh
 
-          makeself --zstd package-ethos ./ethos-$ARCH.run "Ethos ($ARCH)" ./run.sh
+          makeself --zstd --notemp package-ethos ./ethos-$ARCH.run "Ethos ($ARCH)" ./run.sh
 
           cd /workspace/forge
           python -m nuitka $COMMON_FLAGS -o forge-$ARCH main.py
@@ -105,15 +105,12 @@ jobs:
           cat << 'EOF3' > package-forge/run.sh
           #!/data/data/com.termux/files/usr/bin/bash
           export LD_LIBRARY_PATH=$PREFIX/lib
-          ./main.dist/forge-*
+          exec ./main.dist/forge-* "$@"
           EOF3
 
           chmod +x package-forge/run.sh
 
-          makeself --zstd package-forge ./forge-$ARCH.run "Forge ($ARCH)" ./run.sh
-
-          ls -lh /workspace/ethos-lang
-          ls -lh /workspace/forge
+          makeself --zstd --notemp package-forge ./forge-$ARCH.run "Forge ($ARCH)" ./run.sh
           EOF
 
           chmod 777 build.sh
