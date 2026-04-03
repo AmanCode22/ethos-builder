@@ -93,7 +93,7 @@ jobs:
 
           chmod +x package-ethos/run.sh
 
-          makeself --zstd package-ethos ethos-$ARCH.run "Ethos ($ARCH)" ./run.sh
+          makeself --zstd package-ethos ./ethos-$ARCH.run "Ethos ($ARCH)" ./run.sh
 
           cd /workspace/forge
           python -m nuitka $COMMON_FLAGS -o forge-$ARCH main.py
@@ -110,7 +110,10 @@ jobs:
 
           chmod +x package-forge/run.sh
 
-          makeself --zstd package-forge forge-$ARCH.run "Forge ($ARCH)" ./run.sh
+          makeself --zstd package-forge ./forge-$ARCH.run "Forge ($ARCH)" ./run.sh
+
+          ls -lh /workspace/ethos-lang
+          ls -lh /workspace/forge
           EOF
 
           chmod 777 build.sh
@@ -127,5 +130,5 @@ jobs:
         with:
           name: binaries-${{ matrix.arch }}
           path: |
-            ethos-lang/ethos-*.run
-            forge/forge-*.run
+            ethos-lang/*.run
+            forge/*.run
