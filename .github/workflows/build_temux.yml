@@ -76,7 +76,7 @@ jobs:
           mv makeself-header.sh $PREFIX/bin/
           chmod +x $PREFIX/bin/makeself
 
-          COMMON_FLAGS="--standalone --clang --jobs=1 --no-lto"
+          COMMON_FLAGS="--standalone --clang --jobs=1 --lto=no"
 
           cd /workspace/ethos-lang
           python -m nuitka $COMMON_FLAGS -o ethos-$ARCH main.py
