@@ -67,7 +67,7 @@ jobs:
             python binutils clang patchelf build-essential \
             libexpat zstd termux-elf-cleaner ldd git curl
 
-          pip install nuitka
+          pip install -U nuitka
 
           curl -LO https://github.com/megastep/makeself/releases/latest/download/makeself.sh
           curl -LO https://github.com/megastep/makeself/releases/latest/download/makeself-header.sh
@@ -76,20 +76,19 @@ jobs:
           mv makeself-header.sh $PREFIX/bin/
           chmod +x $PREFIX/bin/makeself
 
-          COMMON_FLAGS="--standalone --clang --jobs=1 --lto=no"
+          COMMON_FLAGS="--standalone --clang --jobs=1"
 
           cd /workspace/ethos-lang
           python -m nuitka $COMMON_FLAGS -o ethos-$ARCH main.py
-          termux-elf-cleaner ethos-$ARCH.dist/ethos-$ARCH
-          strip --strip-unneeded ethos-$ARCH.dist/ethos-$ARCH
+          termux-elf-cleaner main.dist/ethos-$ARCH
 
           mkdir -p package-ethos
-          cp -r ethos-$ARCH.dist package-ethos/
+          cp -r main.dist package-ethos/
 
           cat << 'EOF2' > package-ethos/run.sh
           #!/data/data/com.termux/files/usr/bin/bash
           export LD_LIBRARY_PATH=$PREFIX/lib
-          ./ethos-*/ethos-*
+          ./main.dist/ethos-*
           EOF2
 
           chmod +x package-ethos/run.sh
@@ -98,16 +97,15 @@ jobs:
 
           cd /workspace/forge
           python -m nuitka $COMMON_FLAGS -o forge-$ARCH main.py
-          termux-elf-cleaner forge-$ARCH.dist/forge-$ARCH
-          strip --strip-unneeded forge-$ARCH.dist/forge-$ARCH
+          termux-elf-cleaner main.dist/forge-$ARCH
 
           mkdir -p package-forge
-          cp -r forge-$ARCH.dist package-forge/
+          cp -r main.dist package-forge/
 
           cat << 'EOF3' > package-forge/run.sh
           #!/data/data/com.termux/files/usr/bin/bash
           export LD_LIBRARY_PATH=$PREFIX/lib
-          ./forge-*/forge-*
+          ./main.dist/forge-*
           EOF3
 
           chmod +x package-forge/run.sh
