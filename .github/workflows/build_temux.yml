@@ -1,4 +1,4 @@
-name: Build for Termux (Android) - Onefile Zstd
+name: Build for Termux (Android) - Makeself Zstd
 
 on:
   workflow_dispatch:
@@ -53,32 +53,59 @@ jobs:
           cat << 'EOF' > build.sh
           #!/data/data/com.termux/files/usr/bin/bash
           set -e
-          
+
           export ARCH=$1
           export NUITKA_CACHE_DIR=/workspace/nuitka-cache
           export DEBIAN_FRONTEND=noninteractive
-          
+
           echo "deb https://packages-cf.termux.dev/apt/termux-main stable main" > $PREFIX/etc/apt/sources.list
-          
+
           apt-get update
           apt-get upgrade -y -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-confdef"
-          
-          apt-get install -y -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-confdef" \
-            python binutils clang patchelf build-essential libexpat zstd termux-elf-cleaner ldd
-            
-          pip install nuitka zstandard
-          
-          TEMP_SPEC="{HOME}/.nuitka"
-          
-          COMMON_FLAGS="--onefile --low-memory --clang --unstripped --jobs=$(nproc) --onefile-tempdir-spec=$TEMP_SPEC"
-          
+
+          apt-get install -y \
+            python binutils clang patchelf build-essential \
+            libexpat zstd makeself termux-elf-cleaner ldd
+
+          pip install nuitka
+
+          COMMON_FLAGS="--standalone --clang --jobs=1 --no-lto"
+
           cd /workspace/ethos-lang
           python -m nuitka $COMMON_FLAGS -o ethos-$ARCH main.py
-          termux-elf-cleaner ethos-$ARCH
-          
+          termux-elf-cleaner ethos-$ARCH.dist/ethos-$ARCH
+          strip --strip-unneeded ethos-$ARCH.dist/ethos-$ARCH
+
+          mkdir -p package-ethos
+          cp -r ethos-$ARCH.dist package-ethos/
+
+          cat << 'EOF2' > package-ethos/run.sh
+          #!/data/data/com.termux/files/usr/bin/bash
+          export LD_LIBRARY_PATH=$PREFIX/lib
+          ./ethos-*/ethos-*
+          EOF2
+
+          chmod +x package-ethos/run.sh
+
+          makeself --zstd package-ethos ethos-$ARCH.run "Ethos ($ARCH)" ./run.sh
+
           cd /workspace/forge
           python -m nuitka $COMMON_FLAGS -o forge-$ARCH main.py
-          termux-elf-cleaner forge-$ARCH
+          termux-elf-cleaner forge-$ARCH.dist/forge-$ARCH
+          strip --strip-unneeded forge-$ARCH.dist/forge-$ARCH
+
+          mkdir -p package-forge
+          cp -r forge-$ARCH.dist package-forge/
+
+          cat << 'EOF3' > package-forge/run.sh
+          #!/data/data/com.termux/files/usr/bin/bash
+          export LD_LIBRARY_PATH=$PREFIX/lib
+          ./forge-*/forge-*
+          EOF3
+
+          chmod +x package-forge/run.sh
+
+          makeself --zstd package-forge forge-$ARCH.run "Forge ($ARCH)" ./run.sh
           EOF
 
           chmod 777 build.sh
@@ -95,5 +122,5 @@ jobs:
         with:
           name: binaries-${{ matrix.arch }}
           path: |
-            ethos-lang/ethos-*
-            forge/forge-*
+            ethos-lang/ethos-*.run
+            forge/forge-*.run
