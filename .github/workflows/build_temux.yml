@@ -69,12 +69,12 @@ jobs:
 
           pip install -U nuitka
 
-          curl -LO https://github.com/megastep/makeself/releases/latest/download/makeself.sh
-          curl -LO https://github.com/megastep/makeself/releases/latest/download/makeself-header.sh
+          curl -L https://raw.githubusercontent.com/megastep/makeself/refs/heads/master/makeself.sh -o makeself
+          curl -L https://raw.githubusercontent.com/megastep/makeself/refs/heads/master/makeself-header.sh -o makeself-header.sh
 
-          mv makeself.sh $PREFIX/bin/makeself
+          chmod +x makeself
+          mv makeself $PREFIX/bin/
           mv makeself-header.sh $PREFIX/bin/
-          chmod +x $PREFIX/bin/makeself
 
           COMMON_FLAGS="--standalone --clang --jobs=1"
 
