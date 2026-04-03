@@ -1,0 +1,99 @@
+name: Build for Termux (Android) - Onefile Zstd
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-termux:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: aarch64
+            platform: linux/arm64
+            image: termux/termux-docker:aarch64
+            runner: ubuntu-24.04-arm
+          - arch: armv7
+            platform: linux/arm/v7
+            image: termux/termux-docker:arm
+            runner: ubuntu-latest
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout Source Files
+        uses: actions/checkout@v4
+        with:
+          repository: AmanCode22/ethos-lang
+          path: ethos-lang
+
+      - name: Checkout Forge
+        uses: actions/checkout@v4
+        with:
+          repository: AmanCode22/forge
+          path: forge
+
+      - name: Set up QEMU
+        if: matrix.arch == 'armv7'
+        uses: docker/setup-qemu-action@v3
+
+      - name: Cache Nuitka
+        uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/nuitka-cache
+          key: nuitka-${{ matrix.arch }}-${{ github.sha }}
+          restore-keys: |
+            nuitka-${{ matrix.arch }}-
+
+      - name: Build
+        run: |
+          mkdir -p ${{ github.workspace }}/nuitka-cache
+          chmod -R 777 ${{ github.workspace }}
+
+          cat << 'EOF' > build.sh
+          #!/data/data/com.termux/files/usr/bin/bash
+          set -e
+          
+          export ARCH=$1
+          export NUITKA_CACHE_DIR=/workspace/nuitka-cache
+          export DEBIAN_FRONTEND=noninteractive
+          
+          echo "deb https://packages-cf.termux.dev/apt/termux-main stable main" > $PREFIX/etc/apt/sources.list
+          
+          apt-get update
+          apt-get upgrade -y -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-confdef"
+          
+          apt-get install -y -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-confdef" \
+            python binutils clang patchelf build-essential libexpat zstd termux-elf-cleaner ldd
+            
+          pip install nuitka zstandard
+          
+          TEMP_SPEC="{HOME}/.nuitka"
+          
+          COMMON_FLAGS="--onefile --low-memory --clang --unstripped --jobs=$(nproc) --onefile-tempdir-spec=$TEMP_SPEC"
+          
+          cd /workspace/ethos-lang
+          python -m nuitka $COMMON_FLAGS -o ethos-$ARCH main.py
+          termux-elf-cleaner ethos-$ARCH
+          
+          cd /workspace/forge
+          python -m nuitka $COMMON_FLAGS -o forge-$ARCH main.py
+          termux-elf-cleaner forge-$ARCH
+          EOF
+
+          chmod 777 build.sh
+
+          docker run --rm --privileged \
+            --platform ${{ matrix.platform }} \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            ${{ matrix.image }} \
+            bash /workspace/build.sh ${{ matrix.arch }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries-${{ matrix.arch }}
+          path: |
+            ethos-lang/ethos-*
+            forge/forge-*
