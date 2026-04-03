@@ -65,9 +65,16 @@ jobs:
 
           apt-get install -y \
             python binutils clang patchelf build-essential \
-            libexpat zstd makeself termux-elf-cleaner ldd
+            libexpat zstd termux-elf-cleaner ldd git curl
 
           pip install nuitka
+
+          curl -LO https://github.com/megastep/makeself/releases/latest/download/makeself.sh
+          curl -LO https://github.com/megastep/makeself/releases/latest/download/makeself-header.sh
+
+          mv makeself.sh $PREFIX/bin/makeself
+          mv makeself-header.sh $PREFIX/bin/
+          chmod +x $PREFIX/bin/makeself
 
           COMMON_FLAGS="--standalone --clang --jobs=1 --no-lto"
 
