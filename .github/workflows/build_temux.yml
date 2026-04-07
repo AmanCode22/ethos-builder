@@ -67,53 +67,16 @@ jobs:
             python binutils clang patchelf build-essential \
             libexpat zstd termux-elf-cleaner ldd git curl
 
-          pip install -U nuitka
-
-          curl -L https://raw.githubusercontent.com/megastep/makeself/refs/heads/master/makeself.sh -o makeself
-          curl -L https://raw.githubusercontent.com/megastep/makeself/refs/heads/master/makeself-header.sh -o makeself-header.sh
-
-          chmod +x makeself
-          mv makeself $PREFIX/bin/
-          mv makeself-header.sh $PREFIX/bin/
-
-          COMMON_FLAGS="--standalone --clang --jobs=1 --noinclude-default-mode=error"
+          pip install -U nuitka zstandard 
+          COMMON_FLAGS="--onefile --clang --jobs=1 --noinclude-default-mode=error"
 
           cd /workspace/ethos-lang
           python -m nuitka $COMMON_FLAGS -o ethos-$ARCH main.py
-          termux-elf-cleaner main.dist/ethos-$ARCH
-
-          mkdir -p package-ethos
-          cp -r main.dist package-ethos/
-
-          cat << 'EOF2' > package-ethos/run.sh
-          #!/data/data/com.termux/files/usr/bin/bash
-          export LD_LIBRARY_PATH=$PREFIX/lib
-          exec ./main.dist/ethos-* "$@"
-          EOF2
-
-          chmod +x package-ethos/run.sh
-
-          makeself --zstd --notemp package-ethos ./ethos-$ARCH.run "Ethos ($ARCH)" ./run.sh
-
+          
           cd /workspace/forge
           python -m nuitka $COMMON_FLAGS -o forge-$ARCH main.py
-          termux-elf-cleaner main.dist/forge-$ARCH
-
-          mkdir -p package-forge
-          cp -r main.dist package-forge/
-
-          cat << 'EOF3' > package-forge/run.sh
-          #!/data/data/com.termux/files/usr/bin/bash
-          export LD_LIBRARY_PATH=$PREFIX/lib
-          exec ./main.dist/forge-* "$@"
-          EOF3
-
-          chmod +x package-forge/run.sh
-
-          makeself --zstd --notemp package-forge ./forge-$ARCH.run "Forge ($ARCH)" ./run.sh
-          EOF
-
-          chmod 777 build.sh
+          
+          
 
           docker run --rm --privileged \
             --platform ${{ matrix.platform }} \
@@ -127,5 +90,5 @@ jobs:
         with:
           name: binaries-${{ matrix.arch }}
           path: |
-            ethos-lang/*.run
-            forge/*.run
+            ethos-lang/ethos-*
+            forge/forge-*
