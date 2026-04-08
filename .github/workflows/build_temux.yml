@@ -54,14 +54,12 @@ jobs:
 
             cd "deb-$pkg"
             dpkg-deb --build . "../${pkg}-lang_${VER}_all.deb"
-            zstd -19 "../${pkg}-lang_${VER}_all.deb" -o "../${pkg}-lang_${VER}_all.deb.zst"
+            
           done
 
       - uses: actions/upload-artifact@v4
         with:
           name: termux-universal-deb
-          path: "*_all.deb.zst"
+          path: "*_all.deb"
 
-      - if: github.event_name == 'release'
-        uses: softprops/action-gh-release@v2
-        with: {files: "*_all.deb.zst"}
+      
