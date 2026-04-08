@@ -25,11 +25,11 @@ jobs:
       - name: Build .pyz & .deb
         run: |
           cd ethos-lang
-          python3 -m zipapp src -m "ethos:main" -p "/usr/bin/env python3" -o ethos
+          python3 -m zipapp src -m "ethos.cli:main" -p "/usr/bin/env python3" -o ethos
           chmod +x ethos
 
           cd ../forge
-          python3 -m zipapp src -m "forge:main" -p "/usr/bin/env python3" -o forge
+          python3 -m zipapp . -m "main:main" -p "/usr/bin/env python3" -o forge
           chmod +x forge
 
           
