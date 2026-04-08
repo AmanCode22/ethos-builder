@@ -18,7 +18,7 @@ jobs:
           cd ethos-lang
           ETHOS_VER=$(python3 -c "exec(open('src/ethos/version.py').read()); print(f'{version}-{stage}')")
           cd ../forge
-          FORGE_VER=$(python3 -c "exec(open('src/forge/version.py').read()); print(f'{version}-{stage}')")
+          FORGE_VER=$(python3 -c "exec(open('version.py').read()); print(f'{version}-{stage}')")
           echo "ethos=$ETHOS_VER" >> $GITHUB_OUTPUT
           echo "forge=$FORGE_VER" >> $GITHUB_OUTPUT
 
