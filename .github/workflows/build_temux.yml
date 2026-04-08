@@ -1,94 +1,67 @@
-name: Build for Termux (Android) - Makeself Zstd
+name: Build Termux .deb (Universal)
 
 on:
   workflow_dispatch:
 
 jobs:
-  build-termux:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - arch: aarch64
-            platform: linux/arm64
-            image: termux/termux-docker:aarch64
-            runner: ubuntu-24.04-arm
-          - arch: armv7
-            platform: linux/arm/v7
-            image: termux/termux-docker:arm
-            runner: ubuntu-latest
-
-    runs-on: ${{ matrix.runner }}
-
+  build-deb:
+    runs-on: ubuntu-latest  
     steps:
-      - name: Checkout Source Files
-        uses: actions/checkout@v4
-        with:
-          repository: AmanCode22/ethos-lang
-          path: ethos-lang
+      - uses: actions/checkout@v4
+        with: {repository: AmanCode22/ethos-lang, path: ethos-lang}
+      - uses: actions/checkout@v4
+        with: {repository: AmanCode22/forge, path: forge}
 
-      - name: Checkout Forge
-        uses: actions/checkout@v4
-        with:
-          repository: AmanCode22/forge
-          path: forge
-
-      - name: Set up QEMU
-        if: matrix.arch == 'armv7'
-        uses: docker/setup-qemu-action@v3
-
-      - name: Cache Nuitka
-        uses: actions/cache@v4
-        with:
-          path: ${{ github.workspace }}/nuitka-cache
-          key: nuitka-${{ matrix.arch }}-${{ github.sha }}
-          restore-keys: |
-            nuitka-${{ matrix.arch }}-
-
-      - name: Build
+      - name: Extract Versions
+        id: versions
         run: |
-          mkdir -p ${{ github.workspace }}/nuitka-cache
-          chmod -R 777 ${{ github.workspace }}
+          cd ethos-lang
+          ETHOS_VER=$(python3 -c "exec(open('src/ethos/version.py').read()); print(f'{version}-{stage}')")
+          cd ../forge
+          FORGE_VER=$(python3 -c "exec(open('src/forge/version.py').read()); print(f'{version}-{stage}')")
+          echo "ethos=$ETHOS_VER" >> $GITHUB_OUTPUT
+          echo "forge=$FORGE_VER" >> $GITHUB_OUTPUT
 
-          cat << 'EOF' > build.sh
-          #!/data/data/com.termux/files/usr/bin/bash
-          set -e
+      - name: Build .pyz & .deb
+        run: |
+          cd ethos-lang
+          python3 -m zipapp src -m "ethos.cli:main" -p "/usr/bin/env python3" -o ethos
+          chmod +x ethos
 
-          export ARCH=$1
-          export NUITKA_CACHE_DIR=/workspace/nuitka-cache
-          export DEBIAN_FRONTEND=noninteractive
+          cd ../forge
+          python3 -m zipapp src -m "forge.cli:main" -p "/usr/bin/env python3" -o forge
+          chmod +x forge
 
-          echo "deb https://packages-cf.termux.dev/apt/termux-main stable main" > $PREFIX/etc/apt/sources.list
-
-          apt-get update
-          apt-get upgrade -y -o Dpkg::Options::="--force-confold" -o Dpkg::Options::="--force-confdef"
-
-          apt-get install -y \
-            python binutils clang patchelf build-essential \
-            libexpat zstd termux-elf-cleaner ldd git curl
-
-          pip install -U nuitka zstandard 
-          COMMON_FLAGS="--onefile --clang --jobs=1 --noinclude-default-mode=error"
-
-          cd /workspace/ethos-lang
-          python -m nuitka $COMMON_FLAGS -o ethos-$ARCH main.py
           
-          cd /workspace/forge
-          python -m nuitka $COMMON_FLAGS -o forge-$ARCH main.py
-          
-          
+          for pkg in ethos forge; do
+            VER=$([ "$pkg" = "ethos" ] && echo "${{ steps.versions.outputs.ethos }}" || echo "${{ steps.versions.outputs.forge }}")
+            mkdir -p "deb-$pkg/DEBIAN" "deb-$pkg/data/data/com.termux/files/usr/bin" "deb-$pkg/data/data/com.termux/files/home/.${pkg}/traits/hard_traits"
+            cp "$pkg/$pkg" "deb-$pkg/data/data/com.termux/files/usr/bin/$pkg"
+            chmod 755 "deb-$pkg/data/data/com.termux/files/usr/bin/$pkg"
 
-          docker run --rm --privileged \
-            --platform ${{ matrix.platform }} \
-            -v ${{ github.workspace }}:/workspace \
-            -w /workspace \
-            ${{ matrix.image }} \
-            bash /workspace/build.sh ${{ matrix.arch }}
+            printf 'Package: %s-lang\n' "$pkg" > "deb-$pkg/DEBIAN/control"
+            printf 'Version: %s\n' "$VER" >> "deb-$pkg/DEBIAN/control"
+            printf 'Architecture: all\n' >> "deb-$pkg/DEBIAN/control"
+            printf 'Depends: python (>= 3.10)\n' >> "deb-$pkg/DEBIAN/control"
+            printf 'Maintainer: AmanCode22\n' >> "deb-$pkg/DEBIAN/control"
+            printf 'Installed-Size: %s\n' "$(du -sk "deb-$pkg/data" | cut -f1)" >> "deb-$pkg/DEBIAN/control"
+            printf 'Section: interpreters\n' >> "deb-$pkg/DEBIAN/control"
+            printf 'Priority: optional\n' >> "deb-$pkg/DEBIAN/control"
+            printf 'Description: %s CLI for Termux (pure Python)\n' "${pkg^}" >> "deb-$pkg/DEBIAN/control"
 
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
+            printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.ethos/traits/hard_traits" "$HOME/.forge/traits/hard_traits"\nexit 0\n' > "deb-$pkg/DEBIAN/postinst"
+            chmod 755 "deb-$pkg/DEBIAN/postinst"
+
+            cd "deb-$pkg"
+            dpkg-deb --build . "../${pkg}-lang_${VER}_all.deb"
+            zstd -19 "../${pkg}-lang_${VER}_all.deb" -o "../${pkg}-lang_${VER}_all.deb.zst"
+          done
+
+      - uses: actions/upload-artifact@v4
         with:
-          name: binaries-${{ matrix.arch }}
-          path: |
-            ethos-lang/ethos-*
-            forge/forge-*
+          name: termux-universal-deb
+          path: "*_all.deb.zst"
+
+      - if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with: {files: "*_all.deb.zst"}
