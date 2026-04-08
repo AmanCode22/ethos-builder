@@ -1,16 +1,21 @@
-name: Build Termux .deb (Universal)
+name: "Build Termux .deb (Universal)"
 
 on:
   workflow_dispatch:
 
 jobs:
   build-deb:
-    runs-on: ubuntu-latest  
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: {repository: AmanCode22/ethos-lang, path: ethos-lang}
+        with:
+          repository: AmanCode22/ethos-lang
+          path: ethos-lang
+
       - uses: actions/checkout@v4
-        with: {repository: AmanCode22/forge, path: forge}
+        with:
+          repository: AmanCode22/forge
+          path: forge
 
       - name: Extract Versions
         id: versions
@@ -32,11 +37,10 @@ jobs:
           python3 -m zipapp . -m "main:main" -p "/usr/bin/env python3" -o forge
           chmod +x forge
 
-          
           for pkg in ethos forge; do
             VER=$([ "$pkg" = "ethos" ] && echo "${{ steps.versions.outputs.ethos }}" || echo "${{ steps.versions.outputs.forge }}")
             mkdir -p "deb-$pkg/DEBIAN" "deb-$pkg/data/data/com.termux/files/usr/bin" "deb-$pkg/data/data/com.termux/files/home/.${pkg}/traits/hard_traits"
-            cp "$pkg/$pkg" "deb-$pkg/data/data/com.termux/files/usr/bin/$pkg"
+            cp "../$pkg/$pkg" "deb-$pkg/data/data/com.termux/files/usr/bin/$pkg"
             chmod 755 "deb-$pkg/data/data/com.termux/files/usr/bin/$pkg"
 
             printf 'Package: %s-lang\n' "$pkg" > "deb-$pkg/DEBIAN/control"
@@ -54,12 +58,10 @@ jobs:
 
             cd "deb-$pkg"
             dpkg-deb --build . "../${pkg}-lang_${VER}_all.deb"
-            
+            cd ..
           done
 
       - uses: actions/upload-artifact@v4
         with:
           name: termux-universal-deb
           path: "*_all.deb"
-
-      
