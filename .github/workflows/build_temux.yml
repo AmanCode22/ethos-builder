@@ -17,8 +17,8 @@ jobs:
       - name: Extract Versions
         id: versions
         run: |
-          ETHOS_VER=$(python3 -c "exec(open('ethos-lang/src/ethos/version.py').read()); print(f'{version}-{stage}')")
-          FORGE_VER=$(python3 -c "exec(open('forge/version.py').read()); print(f'{version}-{stage}')")
+          ETHOS_VER=$(python3 -c "exec(open('ethos-lang/src/ethos/version.py').read()); print(f'{version}-{stage}')" | sed 's/^v//I' | tr '[:upper:]' '[:lower:]')
+          FORGE_VER=$(python3 -c "exec(open('forge/version.py').read()); print(f'{version}-{stage}')" | sed 's/^v//I' | tr '[:upper:]' '[:lower:]')
           echo "ethos=$ETHOS_VER" >> $GITHUB_OUTPUT
           echo "forge=$FORGE_VER" >> $GITHUB_OUTPUT
 
