@@ -9,6 +9,7 @@ jobs:
         with:
           repository: AmanCode22/ethos-lang
           path: ethos-lang
+
       - uses: actions/checkout@v4
         with:
           repository: AmanCode22/forge
@@ -35,7 +36,7 @@ jobs:
           mkdir -p deb/DEBIAN deb/data/data/com.termux/files/usr/bin
           cp ethos deb/data/data/com.termux/files/usr/bin/ethos
           chmod 755 deb/data/data/com.termux/files/usr/bin/ethos
-          cat > deb/DEBIAN/control <<EOF
+          cat > deb/DEBIAN/control << EOF
           Package: ethos-lang
           Version: $VER
           Architecture: all
@@ -44,7 +45,12 @@ jobs:
           Installed-Size: $(du -sk deb/data | cut -f1)
           Section: interpreters
           Priority: optional
-          Description: Ethos CLI for Termux (pure Python)
+          Description: English-like programming language that transpiles to Python
+           Ethos lets you write code in plain English syntax with no brackets
+           or semicolons. Every statement ends with a period. Supports if/while
+           loops, functions, imports, type casting, string slicing, and Traits
+           (both Python packages and native C/C++/Rust binaries via ctypes).
+           This Termux build runs on Python via zipapp with no native deps.
           EOF
           printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.ethos/traits/hard_traits"\nexit 0\n' > deb/DEBIAN/postinst
           chmod 755 deb/DEBIAN/postinst
@@ -57,7 +63,7 @@ jobs:
           mkdir -p deb/DEBIAN deb/data/data/com.termux/files/usr/bin
           cp forge-bin deb/data/data/com.termux/files/usr/bin/forge
           chmod 755 deb/data/data/com.termux/files/usr/bin/forge
-          cat > deb/DEBIAN/control <<EOF
+          cat > deb/DEBIAN/control << EOF
           Package: forge-lang
           Version: $VER
           Architecture: all
@@ -66,14 +72,19 @@ jobs:
           Installed-Size: $(du -sk deb/data | cut -f1)
           Section: interpreters
           Priority: optional
-          Description: Forge CLI for Termux (pure Python)
+          Description: Package manager for the Ethos language
+           Forge installs and manages Traits for Ethos. Soft Traits are Python
+           packages pulled from PyPI or local wheels, extracted into ~/.ethos/traits/.
+           Hard Traits are compiled C/C++/Rust binaries loaded via ctypes. Forge
+           never runs install scripts and works entirely from the standard library.
+           Use alongside ethos-lang or standalone to manage your Ethos environment.
           EOF
           printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.forge/traits/hard_traits"\nexit 0\n' > deb/DEBIAN/postinst
           chmod 755 deb/DEBIAN/postinst
           dpkg-deb --build deb "forge-lang_${VER}_all.deb"
           rm -rf deb
 
-      - name: Clean up source dirs to free space
+      - name: Free space before upload
         run: rm -rf ethos-lang forge ethos forge-bin
 
       - uses: actions/upload-artifact@v4
