@@ -1,8 +1,6 @@
 name: "Build Termux .deb (Universal)"
-
 on:
   workflow_dispatch:
-
 jobs:
   build-deb:
     runs-on: ubuntu-latest
@@ -11,7 +9,6 @@ jobs:
         with:
           repository: AmanCode22/ethos-lang
           path: ethos-lang
-
       - uses: actions/checkout@v4
         with:
           repository: AmanCode22/forge
@@ -20,46 +17,64 @@ jobs:
       - name: Extract Versions
         id: versions
         run: |
-          cd ethos-lang
-          ETHOS_VER=$(python3 -c "exec(open('src/ethos/version.py').read()); print(f'{version}-{stage}')")
-          cd ../forge
-          FORGE_VER=$(python3 -c "exec(open('version.py').read()); print(f'{version}-{stage}')")
+          ETHOS_VER=$(python3 -c "exec(open('ethos-lang/src/ethos/version.py').read()); print(f'{version}-{stage}')")
+          FORGE_VER=$(python3 -c "exec(open('forge/version.py').read()); print(f'{version}-{stage}')")
           echo "ethos=$ETHOS_VER" >> $GITHUB_OUTPUT
           echo "forge=$FORGE_VER" >> $GITHUB_OUTPUT
 
-      - name: Build .pyz & .deb
+      - name: Build .pyz archives
         run: |
-          cd ethos-lang
-          python3 -m zipapp src -m "ethos.cli:main" -p "/usr/bin/env python3" -o ethos
+          python3 -m zipapp ethos-lang/src -m "ethos.cli:main" -p "/usr/bin/env python3" -o ethos
           chmod +x ethos
+          python3 -m zipapp forge -m "main:main" -p "/usr/bin/env python3" -o forge-bin
+          chmod +x forge-bin
 
-          cd ../forge
-          python3 -m zipapp . -m "main:main" -p "/usr/bin/env python3" -o forge
-          chmod +x forge
+      - name: Build ethos .deb
+        run: |
+          VER="${{ steps.versions.outputs.ethos }}"
+          mkdir -p deb/DEBIAN deb/data/data/com.termux/files/usr/bin
+          cp ethos deb/data/data/com.termux/files/usr/bin/ethos
+          chmod 755 deb/data/data/com.termux/files/usr/bin/ethos
+          cat > deb/DEBIAN/control <<EOF
+          Package: ethos-lang
+          Version: $VER
+          Architecture: all
+          Depends: python (>= 3.10)
+          Maintainer: AmanCode22
+          Installed-Size: $(du -sk deb/data | cut -f1)
+          Section: interpreters
+          Priority: optional
+          Description: Ethos CLI for Termux (pure Python)
+          EOF
+          printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.ethos/traits/hard_traits"\nexit 0\n' > deb/DEBIAN/postinst
+          chmod 755 deb/DEBIAN/postinst
+          dpkg-deb --build deb "ethos-lang_${VER}_all.deb"
+          rm -rf deb
 
-          for pkg in ethos forge; do
-            VER=$([ "$pkg" = "ethos" ] && echo "${{ steps.versions.outputs.ethos }}" || echo "${{ steps.versions.outputs.forge }}")
-            mkdir -p "deb-$pkg/DEBIAN" "deb-$pkg/data/data/com.termux/files/usr/bin" "deb-$pkg/data/data/com.termux/files/home/.${pkg}/traits/hard_traits"
-            cp "../$pkg/$pkg" "deb-$pkg/data/data/com.termux/files/usr/bin/$pkg"
-            chmod 755 "deb-$pkg/data/data/com.termux/files/usr/bin/$pkg"
+      - name: Build forge .deb
+        run: |
+          VER="${{ steps.versions.outputs.forge }}"
+          mkdir -p deb/DEBIAN deb/data/data/com.termux/files/usr/bin
+          cp forge-bin deb/data/data/com.termux/files/usr/bin/forge
+          chmod 755 deb/data/data/com.termux/files/usr/bin/forge
+          cat > deb/DEBIAN/control <<EOF
+          Package: forge-lang
+          Version: $VER
+          Architecture: all
+          Depends: python (>= 3.10)
+          Maintainer: AmanCode22
+          Installed-Size: $(du -sk deb/data | cut -f1)
+          Section: interpreters
+          Priority: optional
+          Description: Forge CLI for Termux (pure Python)
+          EOF
+          printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.forge/traits/hard_traits"\nexit 0\n' > deb/DEBIAN/postinst
+          chmod 755 deb/DEBIAN/postinst
+          dpkg-deb --build deb "forge-lang_${VER}_all.deb"
+          rm -rf deb
 
-            printf 'Package: %s-lang\n' "$pkg" > "deb-$pkg/DEBIAN/control"
-            printf 'Version: %s\n' "$VER" >> "deb-$pkg/DEBIAN/control"
-            printf 'Architecture: all\n' >> "deb-$pkg/DEBIAN/control"
-            printf 'Depends: python (>= 3.10)\n' >> "deb-$pkg/DEBIAN/control"
-            printf 'Maintainer: AmanCode22\n' >> "deb-$pkg/DEBIAN/control"
-            printf 'Installed-Size: %s\n' "$(du -sk "deb-$pkg/data" | cut -f1)" >> "deb-$pkg/DEBIAN/control"
-            printf 'Section: interpreters\n' >> "deb-$pkg/DEBIAN/control"
-            printf 'Priority: optional\n' >> "deb-$pkg/DEBIAN/control"
-            printf 'Description: %s CLI for Termux (pure Python)\n' "${pkg^}" >> "deb-$pkg/DEBIAN/control"
-
-            printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.ethos/traits/hard_traits" "$HOME/.forge/traits/hard_traits"\nexit 0\n' > "deb-$pkg/DEBIAN/postinst"
-            chmod 755 "deb-$pkg/DEBIAN/postinst"
-
-            cd "deb-$pkg"
-            dpkg-deb --build . "../${pkg}-lang_${VER}_all.deb"
-            cd ..
-          done
+      - name: Clean up source dirs to free space
+        run: rm -rf ethos-lang forge ethos forge-bin
 
       - uses: actions/upload-artifact@v4
         with:
