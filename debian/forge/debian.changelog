@@ -1,6 +1,8 @@
-ethos-forge (0.4.0-1) unstable; urgency=medium
+ethos-forge (0.5.0-1) unstable; urgency=medium
 
-  * Fixed critical issue in cli.
-  * Added dependencies support in soft traits.
 
- -- Aman Adlakha <amanady125@gmail.com>  Mon, 30 Mar 2026 17:30:00 +0530
+  * Fixed critical bugs.
+  * Added hard traits proper support and support of foundry
+
+
+ -- Aman Adlakha <amanady125@gmail.com>  Mon, 11 April 2026 17:00:00 +0530
