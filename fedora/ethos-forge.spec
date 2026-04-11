@@ -56,7 +56,7 @@ install -m 0755 forge %{buildroot}%{_bindir}/forge
 
 
 %changelog
-* Sat April 11 2026 Aman Adlakha <amanady125@gmail.com> - 0.5.0-1
+* Sat Apr 11 2026 Aman Adlakha <amanady125@gmail.com> - 0.5.0-1
 - Fixed critical bugs.
 - Complete hard traits support
 - Added foundry
