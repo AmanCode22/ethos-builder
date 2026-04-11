@@ -1,5 +1,5 @@
 #define MyAppName "Ethos"
-#define MyAppVersion "0.4.0-beta"
+#define MyAppVersion "0.5.0-beta"
 #define MyAppPublisher "Aman Adlakha"
 #define MyAppURL "https://github.com/AmanCode22/ethos-lang"
 #define MyAppExeName "ethos.exe"
