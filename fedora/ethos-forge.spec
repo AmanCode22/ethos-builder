@@ -3,7 +3,7 @@
 %global __os_install_post %{nil}
 
 Name:           ethos-forge
-Version:        0.4.0
+Version:        0.5.0
 Release:        1%{?dist}
 Summary:        The Ethos Package Manager
 
@@ -54,7 +54,9 @@ install -m 0755 forge %{buildroot}%{_bindir}/forge
 %files
 %{_bindir}/forge
 
+
 %changelog
-* Mon Mar 30 2026 Aman Adlakha <amanady125@gmail.com> - 0.4.0-1
-- Fixed critical issue in cli.
-- Added dependencies support in soft traits.
+* Sat April 11 2026 Aman Adlakha <amanady125@gmail.com> - 0.5.0-1
+- Fixed critical bugs.
+- Complete hard traits support
+- Added foundry
