@@ -3,7 +3,7 @@
 %global __os_install_post %{nil}
 
 Name:           ethos-lang
-Version:        0.4.0
+Version:        0.5.0
 Release:        1%{?dist}
 Summary:        The Ethos Programming Language Compiler
 
@@ -56,7 +56,7 @@ install -m 0755 ethos %{buildroot}%{_bindir}/ethos
 %{_bindir}/ethos
 
 %changelog
-* Mon Mar 30 2026 Aman Adlakha <amanady125@gmail.com> - 0.4.0-1
-- Added std python libs support using shim.
+* Sat April 11 2026 Aman Adlakha <amanady125@gmail.com> - 0.5.0-1
 - Fixed critical bugs.
-- Added type casting support
+- Complete hard traits support
+- Added foundry
