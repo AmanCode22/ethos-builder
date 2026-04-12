@@ -56,8 +56,7 @@ jobs:
           EOF
           printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.ethos/traits/hard_traits"\nexit 0\n' > deb/DEBIAN/postinst
           chmod 755 deb/DEBIAN/postinst
-          
-          dpkg-deb --build --compress=gzip deb "ethos-lang_${VER}_all.deb"
+          dpkg-deb -Zgzip --build deb "ethos-lang_${VER}_all.deb"
           rm -rf deb
 
       - name: Build ethos-forge .deb
@@ -84,13 +83,11 @@ jobs:
           EOF
           printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.forge/traits/hard_traits"\nexit 0\n' > deb/DEBIAN/postinst
           chmod 755 deb/DEBIAN/postinst
-          
-          dpkg-deb --build --compress=gzip deb "ethos-forge_${VER}_all.deb"
+          dpkg-deb -Zgzip --build deb "ethos-forge_${VER}_all.deb"
           rm -rf deb
 
-      - name: Create symlink for backward compatibility 
+      - name: Create transitional package
         run: |
-          
           mkdir -p symlink-deb/DEBIAN symlink-deb/data/data/com.termux/files/usr/bin
           ln -s ethos-forge symlink-deb/data/data/com.termux/files/usr/bin/forge
           cat > symlink-deb/DEBIAN/control << EOF
@@ -105,7 +102,9 @@ jobs:
            This is a transitional package to migrate from forge-lang to ethos-forge.
            You can safely remove it after upgrading.
           EOF
-          dpkg-deb --build --compress=gzip symlink-deb "forge-lang_${{ steps.versions.outputs.forge }}_all.deb"
+          printf '#!/data/data/com.termux/files/usr/bin/bash\nexit 0\n' > symlink-deb/DEBIAN/postinst
+          chmod 755 symlink-deb/DEBIAN/postinst
+          dpkg-deb -Zgzip --build symlink-deb "forge-lang_${{ steps.versions.outputs.forge }}_all.deb"
 
       - name: Free space before upload
         run: rm -rf ethos-lang forge ethos forge-bin symlink-deb
