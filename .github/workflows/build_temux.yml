@@ -32,7 +32,7 @@ jobs:
           python3 -m zipapp forge -m "main:main" -p "/usr/bin/env python3" -o forge-bin
           chmod +x forge-bin
 
-      - name: Build ethos .deb
+      - name: Build ethos-lang .deb
         run: |
           VER="${{ steps.versions.outputs.ethos }}"
           mkdir -p deb/DEBIAN deb/data/data/com.termux/files/usr/bin
@@ -86,28 +86,8 @@ jobs:
           dpkg-deb -Zgzip --build deb "ethos-forge_${VER}_all.deb"
           rm -rf deb
 
-      - name: Create transitional package
-        run: |
-          mkdir -p symlink-deb/DEBIAN symlink-deb/data/data/com.termux/files/usr/bin
-          ln -s ethos-forge symlink-deb/data/data/com.termux/files/usr/bin/forge
-          cat > symlink-deb/DEBIAN/control << EOF
-          Package: forge-lang
-          Version: ${{ steps.versions.outputs.forge }}
-          Architecture: all
-          Depends: ethos-forge
-          Maintainer: AmanCode22
-          Section: old
-          Priority: optional
-          Description: Transitional package (now ethos-forge)
-           This is a transitional package to migrate from forge-lang to ethos-forge.
-           You can safely remove it after upgrading.
-          EOF
-          printf '#!/data/data/com.termux/files/usr/bin/bash\nexit 0\n' > symlink-deb/DEBIAN/postinst
-          chmod 755 symlink-deb/DEBIAN/postinst
-          dpkg-deb -Zgzip --build symlink-deb "forge-lang_${{ steps.versions.outputs.forge }}_all.deb"
-
       - name: Free space before upload
-        run: rm -rf ethos-lang forge ethos forge-bin symlink-deb
+        run: rm -rf ethos-lang forge ethos forge-bin
 
       - uses: actions/upload-artifact@v4
         with:
