@@ -56,7 +56,7 @@ jobs:
           EOF
           printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.ethos/traits/hard_traits"\nexit 0\n' > deb/DEBIAN/postinst
           chmod 755 deb/DEBIAN/postinst
-          dpkg-deb -Zgzip --build deb "ethos-lang_${VER}_all.deb"
+          dpkg-deb -Zxz --build deb "ethos-lang_${VER}_all.deb"
           rm -rf deb
 
       - name: Build ethos-forge .deb
@@ -83,7 +83,7 @@ jobs:
           EOF
           printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.forge/traits/hard_traits"\nexit 0\n' > deb/DEBIAN/postinst
           chmod 755 deb/DEBIAN/postinst
-          dpkg-deb -Zgzip --build deb "ethos-forge_${VER}_all.deb"
+          dpkg-deb -Zxz --build deb "ethos-forge_${VER}_all.deb"
           rm -rf deb
 
       - name: Free space before upload
