@@ -1,6 +1,8 @@
-name: "Build Termux .deb (Universal)"
+name: Build Termux .deb (Universal)
+
 on:
   workflow_dispatch:
+
 jobs:
   build-deb:
     runs-on: ubuntu-latest
@@ -54,23 +56,24 @@ jobs:
           EOF
           printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.ethos/traits/hard_traits"\nexit 0\n' > deb/DEBIAN/postinst
           chmod 755 deb/DEBIAN/postinst
-          dpkg-deb --build deb "ethos-lang_${VER}_all.deb"
+          
+          dpkg-deb --build --compress=gzip deb "ethos-lang_${VER}_all.deb"
           rm -rf deb
 
-      - name: Build forge .deb
+      - name: Build ethos-forge .deb
         run: |
           VER="${{ steps.versions.outputs.forge }}"
           mkdir -p deb/DEBIAN deb/data/data/com.termux/files/usr/bin
-          cp forge-bin deb/data/data/com.termux/files/usr/bin/forge
-          chmod 755 deb/data/data/com.termux/files/usr/bin/forge
+          cp forge-bin deb/data/data/com.termux/files/usr/bin/ethos-forge
+          chmod 755 deb/data/data/com.termux/files/usr/bin/ethos-forge
           cat > deb/DEBIAN/control << EOF
-          Package: forge-lang
+          Package: ethos-forge
           Version: $VER
           Architecture: all
           Depends: python (>= 3.10)
           Maintainer: AmanCode22
           Installed-Size: $(du -sk deb/data | cut -f1)
-          Section: interpreters
+          Section: devel
           Priority: optional
           Description: Package manager for the Ethos language
            Forge installs and manages Traits for Ethos. Soft Traits are Python
@@ -81,11 +84,31 @@ jobs:
           EOF
           printf '#!/data/data/com.termux/files/usr/bin/bash\nmkdir -p "$HOME/.forge/traits/hard_traits"\nexit 0\n' > deb/DEBIAN/postinst
           chmod 755 deb/DEBIAN/postinst
-          dpkg-deb --build deb "forge-lang_${VER}_all.deb"
+          
+          dpkg-deb --build --compress=gzip deb "ethos-forge_${VER}_all.deb"
           rm -rf deb
 
+      - name: Create symlink for backward compatibility 
+        run: |
+          
+          mkdir -p symlink-deb/DEBIAN symlink-deb/data/data/com.termux/files/usr/bin
+          ln -s ethos-forge symlink-deb/data/data/com.termux/files/usr/bin/forge
+          cat > symlink-deb/DEBIAN/control << EOF
+          Package: forge-lang
+          Version: ${{ steps.versions.outputs.forge }}
+          Architecture: all
+          Depends: ethos-forge
+          Maintainer: AmanCode22
+          Section: old
+          Priority: optional
+          Description: Transitional package (now ethos-forge)
+           This is a transitional package to migrate from forge-lang to ethos-forge.
+           You can safely remove it after upgrading.
+          EOF
+          dpkg-deb --build --compress=gzip symlink-deb "forge-lang_${{ steps.versions.outputs.forge }}_all.deb"
+
       - name: Free space before upload
-        run: rm -rf ethos-lang forge ethos forge-bin
+        run: rm -rf ethos-lang forge ethos forge-bin symlink-deb
 
       - uses: actions/upload-artifact@v4
         with:
