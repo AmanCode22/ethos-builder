@@ -63,8 +63,8 @@ jobs:
         run: |
           VER="${{ steps.versions.outputs.forge }}"
           mkdir -p deb/DEBIAN deb/data/data/com.termux/files/usr/bin
-          cp forge-bin deb/data/data/com.termux/files/usr/bin/ethos-forge
-          chmod 755 deb/data/data/com.termux/files/usr/bin/ethos-forge
+          cp forge-bin deb/data/data/com.termux/files/usr/bin/forge
+          chmod 755 deb/data/data/com.termux/files/usr/bin/forge
           cat > deb/DEBIAN/control << EOF
           Package: ethos-forge
           Version: $VER
